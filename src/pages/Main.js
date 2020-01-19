@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, Image, Text } from 'react-native'
+import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native'
 import MapView, { Marker, Callout } from 'react-native-maps'
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location'
+import { MaterialIcons } from '@expo/vector-icons'
 
 export default class Main extends Component {
   constructor(props) {
@@ -40,20 +41,39 @@ export default class Main extends Component {
   render() {
     if (!this.state.currentRegion) return null
     return (
-      <MapView initialRegion={this.state.currentRegion} style={styles.map}>
-        <Marker coordinate={{ latitude: -12.2455354, longitude: -38.9573567 }}>
-          <Image style={styles.avatar} source={{ uri: "https://avatars1.githubusercontent.com/u/14905849?s=460&v=4" }} />
-          <Callout onPress={() => {
-            this.props.navigation.navigate('Profile', { github_username: 'Thatianne' })
-          }}>
-            <View style={styles.callout}>
-              <Text style={styles.devName}>Thatianne Carvalho</Text>
-              <Text style={styles.devBio}>Web developer</Text>
-              <Text style={styles.devTechs}>Javascript, VueJs, PHP</Text>
-            </View>
-          </Callout>
-        </Marker>
-      </MapView>
+      <>
+        <MapView initialRegion={this.state.currentRegion} style={styles.map}>
+          <Marker coordinate={{ latitude: -12.2455354, longitude: -38.9573567 }}>
+            <Image style={styles.avatar} source={{ uri: "https://avatars1.githubusercontent.com/u/14905849?s=460&v=4" }} />
+            <Callout onPress={() => {
+              this.props.navigation.navigate('Profile', { github_username: 'Thatianne' })
+            }}>
+              <View style={styles.callout}>
+                <Text style={styles.devName}>Thatianne Carvalho</Text>
+                <Text style={styles.devBio}>Web developer</Text>
+                <Text style={styles.devTechs}>Javascript, VueJs, PHP</Text>
+              </View>
+            </Callout>
+          </Marker>
+        </MapView>
+        <View style={styles.searchForm}>
+          <TextInput
+            style={styles.searchInput}
+            placeholher="Buscar devs por techs..."
+            placeholderTextColor="#999"
+            autoCapitalize="words"
+            autoCorrect={false} />
+          <TouchableOpacity
+            onPress={() => { }}
+            style={styles.loadButton}
+          >
+            <MaterialIcons
+              name="my-location"
+              size={20}
+              color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </>
     )
   }
 }
@@ -82,5 +102,38 @@ const styles = StyleSheet.create({
   },
   devTechs: {
     marginTop: 5
+  },
+  searchForm: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    zIndex: 5,
+    flexDirection: 'row'
+  },
+  searchInput: {
+    flex: 1,
+    height: 50,
+    backgroundColor: '#fff',
+    color: '#333',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 4,
+      height: 4
+    },
+    elevation: 2
+  },
+  loadButton: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#8e4dff',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 15
   }
 })
