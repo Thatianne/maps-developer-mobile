@@ -3,16 +3,21 @@ import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'reac
 import MapView, { Marker, Callout } from 'react-native-maps'
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location'
 import { MaterialIcons } from '@expo/vector-icons'
+import api from '../services/api'
 
 export default class Main extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      currentRegion: null
+      currentRegion: null,
+      devs: [],
+      techs: ''
     }
 
     this.loadInitialLocation = this.loadInitialLocation.bind(this)
+    this.loadDevs = this.loadDevs.bind(this)
+    this.handlerRegionChange = this.handlerRegionChange.bind(this)
   }
 
   componentDidMount() {
@@ -38,23 +43,61 @@ export default class Main extends Component {
     }
   }
 
+  async loadDevs() {
+    const { latitude, longitude } = this.state.currentRegion
+    const { techs } = this.state
+
+    const res = await api.get('/search', {
+      params: {
+        latitude,
+        longitude,
+        techs,
+      }
+    })
+
+    this.setState({
+      devs: res.data
+    })
+  }
+
+  handlerRegionChange(region) {
+    this.setState({
+      currentRegion: region
+    })
+  }
+
   render() {
     if (!this.state.currentRegion) return null
     return (
       <>
-        <MapView initialRegion={this.state.currentRegion} style={styles.map}>
-          <Marker coordinate={{ latitude: -12.2455354, longitude: -38.9573567 }}>
-            <Image style={styles.avatar} source={{ uri: "https://avatars1.githubusercontent.com/u/14905849?s=460&v=4" }} />
-            <Callout onPress={() => {
-              this.props.navigation.navigate('Profile', { github_username: 'Thatianne' })
-            }}>
-              <View style={styles.callout}>
-                <Text style={styles.devName}>Thatianne Carvalho</Text>
-                <Text style={styles.devBio}>Web developer</Text>
-                <Text style={styles.devTechs}>Javascript, VueJs, PHP</Text>
-              </View>
-            </Callout>
-          </Marker>
+        <MapView
+          onRegionChangeComplete={this.handlerRegionChange}
+          initialRegion={this.state.currentRegion}
+          style={styles.map}
+        >
+          {this.state.devs.map(dev => (
+            <Marker
+              key={dev._id}
+              coordinate={{
+                latitude: dev.location.coordinates[1],
+                longitude: dev.location.coordinates[0]
+              }}
+            >
+              <Image
+                style={styles.avatar}
+                source={{ uri: dev.avatar_url }}
+              />
+              <Callout onPress={() => {
+                this.props.navigation.navigate('Profile', { github_username: dev.github_username })
+              }}>
+                <View style={styles.callout}>
+                  <Text style={styles.devName}>{dev.name}</Text>
+                  <Text style={styles.devBio}>{dev.bio}</Text>
+                  <Text style={styles.devTechs}>{dev.techs.join(', ')}</Text>
+                </View>
+              </Callout>
+            </Marker>
+          ))}
         </MapView>
         <View style={styles.searchForm}>
           <TextInput
@@ -62,9 +105,11 @@ export default class Main extends Component {
             placeholher="Buscar devs por techs..."
             placeholderTextColor="#999"
             autoCapitalize="words"
-            autoCorrect={false} />
+            autoCorrect={false}
+            value={this.state.tech}
+            onChangeText={text => this.setState({ techs: text })} />
           <TouchableOpacity
-            onPress={() => { }}
+            onPress={this.loadDevs}
             style={styles.loadButton}
           >
             <MaterialIcons
