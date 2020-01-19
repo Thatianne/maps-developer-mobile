@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { View, StyleSheet } from 'react-native'
-import MapView from 'react-native-maps'
+import { View, StyleSheet, Image, Text } from 'react-native'
+import MapView, { Marker, Callout } from 'react-native-maps'
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location'
 
 export default class Main extends Component {
@@ -40,7 +40,20 @@ export default class Main extends Component {
   render() {
     if (!this.state.currentRegion) return null
     return (
-      <MapView initialRegion={this.state.currentRegion} style={styles.map} />
+      <MapView initialRegion={this.state.currentRegion} style={styles.map}>
+        <Marker coordinate={{ latitude: -12.2455354, longitude: -38.9573567 }}>
+          <Image style={styles.avatar} source={{ uri: "https://avatars1.githubusercontent.com/u/14905849?s=460&v=4" }} />
+          <Callout onPress={() => {
+            this.props.navigation.navigate('Profile', { github_username: 'Thatianne' })
+          }}>
+            <View style={styles.callout}>
+              <Text style={styles.devName}>Thatianne Carvalho</Text>
+              <Text style={styles.devBio}>Web developer</Text>
+              <Text style={styles.devTechs}>Javascript, VueJs, PHP</Text>
+            </View>
+          </Callout>
+        </Marker>
+      </MapView>
     )
   }
 }
@@ -48,5 +61,26 @@ export default class Main extends Component {
 const styles = StyleSheet.create({
   map: {
     flex: 1
+  },
+  avatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 4,
+    borderWidth: 4,
+    borderColor: '#fff'
+  },
+  callout: {
+    width: 260
+  },
+  devName: {
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+  devBio: {
+    color: '#666',
+    marginTop: 5
+  },
+  devTechs: {
+    marginTop: 5
   }
 })

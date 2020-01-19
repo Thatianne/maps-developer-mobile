@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { View } from 'react-native'
+import { WebView } from 'react-native-webview'
 
 export default class Profile extends Component {
   constructor(props) {
@@ -7,8 +8,9 @@ export default class Profile extends Component {
   }
 
   render() {
+    const githubUsername = this.props.navigation.getParam('github_username')
     return (
-      <View />
+      <WebView style={{ flex: 1 }} source={{ uri: `https://github.com/${githubUsername}` }} />
     )
   }
 }
