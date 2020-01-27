@@ -4,6 +4,7 @@ import MapView, { Marker, Callout } from 'react-native-maps'
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location'
 import { MaterialIcons } from '@expo/vector-icons'
 import api from '../services/api'
+import { connect, disconnect } from '../services/socket'
 
 export default class Main extends Component {
   constructor(props) {
@@ -18,6 +19,7 @@ export default class Main extends Component {
     this.loadInitialLocation = this.loadInitialLocation.bind(this)
     this.loadDevs = this.loadDevs.bind(this)
     this.handlerRegionChange = this.handlerRegionChange.bind(this)
+    this.setupWebsocket = this.setupWebsocket.bind(this)
   }
 
   componentDidMount() {
@@ -58,6 +60,17 @@ export default class Main extends Component {
     this.setState({
       devs: res.data
     })
+
+    this.setupWebsocket()
+  }
+
+  setupWebsocket() {
+    const { currentRegion: { latitude }, currentRegion: { longitude }, techs } = this.state
+    connect(
+      latitude,
+      longitude,
+      techs
+    )
   }
 
   handlerRegionChange(region) {
